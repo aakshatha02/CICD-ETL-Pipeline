@@ -57,8 +57,24 @@ services:
       #- jenkins-vol:/var/jenkins_home
       - ./jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
-      - /usr/bin/docker:/usr/bin/docker
-      - /usr/local/bin/docker-compose:/usr/local/bin/docker-compose
+      #- /usr/bin/docker:/usr/bin/docker
+      #- /usr/local/bin/docker-compose:/usr/local/bin/docker-compose
+    environment:
+      DOCKER_HOST: tcp://localhost:2375
+      DOCKER_TLS_CERTDIR: "" 
+    networks:
+      - elastic
+    depends_on:
+      - docker
+
+  docker:
+    image: docker:20.10.7-dind
+    privileged: true  
+    ports:
+      - "2375:2375"  
+    networks:
+      - elastic
+
   
   logstash:
     image: docker.elastic.co/logstash/logstash:8.15.3
