@@ -1,40 +1,37 @@
 pipeline {
     agent any
     stages {
-        stage('Clone repository') {
+        stage('Checkout') {
             steps {
+                // Pull the code from Git repository
                 git url: 'https://github.com/aakshatha02/CICD-ETL-Pipeline.git', branch: 'main'
             }
         }
-        stage('Build Docker Image') {
+        stage('Verify Docker Compose') {
+    steps {
+        sh 'docker-compose --version'
+    }
+}
+        stage('Data Ingestion') {
             steps {
-                script {
-                    dockerImage = docker.build("etl-pipeline")
-                }
+                // Trigger Logstash for data ingestion
+                sh 'docker-compose exec logstash logstash -f /usr/share/logstash/pipeline/logstash.conf'
             }
         }
-        stage('SonarQube Analysis') {
+        stage('Code Quality Analysis') {
             steps {
+                // SonarQube analysis step
                 script {
-                    def scannerHome = tool 'SonarQubeScanner'
                     withSonarQubeEnv('SonarQube') {
-                        sh "${scannerHome}/bin/sonar-scanner"
+                        sh 'mvn clean verify sonar:sonar'
                     }
                 }
             }
         }
-        stage('Push Docker Image') {
+        stage('Data Visualization') {
             steps {
-                script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
-                        dockerImage.push('latest')
-                    }
-                }
-            }
-        }
-        stage('Deploy to Kubernetes') {
-            steps {
-                sh 'kubectl apply -f deployment.yaml'
+                // This could be a placeholder to ensure Kibana setup
+                echo "Data visualization available at Kibana: http://localhost:5601"
             }
         }
     }
