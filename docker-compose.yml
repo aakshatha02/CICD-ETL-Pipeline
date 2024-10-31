@@ -17,7 +17,7 @@ services:
           cpus: "2"
           memory: 4g
     volumes:
-      - data1:/usr/share/elasticsearch/data1
+      - esdata:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
     networks:
@@ -30,6 +30,8 @@ services:
       - node.name=kib8
       - cluster.name=es-docker-cluster
       - ELASTICSEARCH_HOSTS=http://es8:9200
+    volumes:
+      - kibanadata:/usr/share/kibana/data
       
     ports:
       - 5601:5601
@@ -70,11 +72,12 @@ services:
       - es8
 
 volumes:
-  data1:
+  esdata:
   sonarqube_data:
   sonarqube_extensions:
   sonarqube_logs:
   jenkins-vol:
+  kibanadata:
     
 networks:
   elastic:
